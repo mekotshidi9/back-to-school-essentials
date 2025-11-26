@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - Back to School Essentials</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f8f8f8;
+        }
+
+        header {
+            background: #1e3a8a;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .contact-details, .contact-form {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #1e3a8a;
+            margin-bottom: 15px;
+        }
+
+        p {
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 20px;
+            background: #1e3a8a;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background: #3b82f6;
+        }
+
+        form input, form textarea {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        form textarea {
+            height: 150px;
+            resize: none;
+        }
+
+        form button {
+            background: #1e3a8a;
+            margin-top: 15px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        form button:hover {
+            background: #3b82f6;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #1e3a8a;
+            color: white;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>Contact Us</header>
+
+<div class="container">
+
+    <!-- Contact Info -->
+    <div class="contact-details">
+        <h2>Get in Touch</h2>
+
+        <p><strong>📞 Call & WhatsApp:</strong><br>
+        <a class="btn" href="https://wa.me/27713535297" target="_blank">Chat on WhatsApp</a></p>
+
+        <p><strong>📧 Email:</strong><br>
+        <a class="btn" href="mailto:Eminentservices100@gmail.com">Send Email</a></p>
+    </div>
+
+    <!-- Contact Form -->
+    <div class="contact-form">
+        <h2>Send Us a Message, Get a Quote</h2>
+
+        <!-- ✅ FormSubmit Enabled -->
+        <form action="https://formsubmit.co/Eminentservices100@gmail.com" method="POST">
+
+            <!-- FormSubmit Settings -->
+            <input type="hidden" name="_captcha" value="false">
+            <input type="hidden" name="_subject" value="New Message from Back to School Essentials Website">
+            <input type="hidden" name="_template" value="table">
+
+            <label>Name:</label>
+            <input type="text" name="name" placeholder="Your name..." required>
+            
+            <label>Email:</label>
+            <input type="email" name="email" placeholder="Your email..." required>
+
+            <label>Message:</label>
+            <textarea name="message" placeholder="Your message..." required></textarea>
+
+            <button type="submit">Send Message</button>
+        </form>
+    </div>
+
+    <!-- Back to Home -->
+    <a class="btn" href="index.html">← Back to Home</a>
+
+</div>
+
+<footer>
+    © 2025 Back to School Essentials — All Rights Reserved
+</footer>
+
+</body>
+
+</html>
