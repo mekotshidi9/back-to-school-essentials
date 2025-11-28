@@ -9,6 +9,31 @@
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&display=swap" rel="stylesheet">
 
 <style>
+    /* Price drop styling & small animations */
+.price-row { margin: 8px 0; display:flex; justify-content:center; align-items:center; gap:10px; }
+.old-price {
+  color: #888;
+  text-decoration: line-through;
+  font-size: 0.95rem;
+  opacity: 0.95;
+  transition: transform .25s ease, opacity .25s ease;
+}
+.new-price {
+  color: #e11d48; /* red-ish */
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+/* small pop animation when inserted */
+.pop {
+  animation: pop 260ms ease;
+}
+@keyframes pop {
+  0%   { transform: scale(0.95); opacity: 0; }
+  60%  { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
 body { margin: 0; font-family: Arial, sans-serif; background: #f8f8f8; }
 
 /* Header */
@@ -75,9 +100,10 @@ nav a:hover {
     margin-bottom: 10px;
     font-family: 'Baloo 2', cursive;
 }
-
-.hero p { font-size: 18px;
- font-family: 'Baloo 2', cursive; }
+.hero p {
+    font-size: 18px;
+    font-family: 'Baloo 2', cursive;
+}
 
 /* Products */
 .products {
@@ -94,6 +120,7 @@ nav a:hover {
     border-radius: 10px;
     text-align: center;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    cursor: pointer;
 }
 .product-card img { width: 100%; border-radius: 10px; }
 .product-card h3 { margin: 15px 0 5px; }
@@ -154,6 +181,32 @@ nav a:hover {
     cursor: pointer;
 }
 
+/* Modal for product details */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    width: 90%;
+    max-width: 400px;
+    border-radius: 10px;
+}
+
+.close-btn {
+    float: right;
+    font-size: 24px;
+    cursor: pointer;
+}
+
 /* Contact & Footer */
 footer {
     background: #1e3a8a;
@@ -167,6 +220,27 @@ footer {
     padding: 20px;
     font-size: 18px;
 }
+.sale-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #dc2626; /* red */
+    color: white;
+    text-align: center;
+    padding: 12px 0;
+    font-size: 18px;
+    font-weight: bold;
+    z-index: 9999;
+    animation: slideUp 0.8s ease-out;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.2);
+}
+
+@keyframes slideUp {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+}
+
 </style>
 </head>
 
@@ -192,54 +266,105 @@ footer {
 </section>
 
 <section class="products">
-    <div class="product-card">
+
+    <!-- A4 Pack -->
+    <div class="product-card" data-price="199.99" onclick="showProductDetails('A4 School Pack')">
         <img src="https://via.placeholder.com/300" alt="A4 School Pack">
         <h3>A4 School Pack</h3>
-        <p>R199.99</p>
-        <button onclick="addToCart('A4 School Pack', 199.99)">Add to Cart</button>
+
+        <div class="price-row">
+            <span class="new-price">R199.99</span>
+            <span class="old-price" aria-hidden="true"></span>
+            
+        </div>
+        <button onclick="addToCart('A4 School Pack', parseFloat(this.closest('.product-card').dataset.price)); event.stopPropagation();">Add to Cart</button>
     </div>
-    <div class="product-card">
+
+    <!-- Maths Set -->
+    <div class="product-card" data-price="249.99" onclick="showProductDetails('Maths Set')">
         <img src="https://via.placeholder.com/300" alt="Maths Set">
         <h3>Maths Set</h3>
-        <p>R249.99</p>
-        <button onclick="addToCart('Maths Set', 249.99)">Add to Cart</button>
+
+        <div class="price-row">
+            <span class="new-price">R249.99</span>
+            <span class="old-price" aria-hidden="true"></span>
+        </div>
+       <button onclick="addToCart('Maths Set', parseFloat(this.closest('.product-card').dataset.price)); event.stopPropagation();">Add to Cart</button>
     </div>
-    <div class="product-card">
+
+    <!-- Colouring Pack -->
+    <div class="product-card" data-price="149.99" onclick="showProductDetails('Colouring Pack')">
         <img src="https://via.placeholder.com/300" alt="Colouring Pack">
         <h3>Colouring Pack</h3>
-        <p>R149.99</p>
-        <button onclick="addToCart('Colouring Pack', 149.99)">Add to Cart</button>
+        
+        <div class="price-row">
+            <span class="new-price">R149.99</span>
+            <span class="old-price" aria-hidden="true"></span>
+            
+        </div>
+        <button onclick="addToCart('Colouring Pack', parseFloat(this.closest('.product-card').dataset.price)); event.stopPropagation();">Add to Cart</button>
     </div>
-    <div class="product-card">
+
+    <!-- Exam Pad Pack -->
+    <div class="product-card" data-price="179.99" onclick="showProductDetails('Exam Pad Pack')">
         <img src="https://via.placeholder.com/300" alt="Exam Pad Pack">
         <h3>Exam Pad Pack</h3>
-        <p>R179.99</p>
-        <button onclick="addToCart('Exam Pad Pack', 179.99)">Add to Cart</button>
+        
+        <div class="price-row">
+            <span class="new-price">R179.99</span>
+            <span class="old-price" aria-hidden="true"></span>
+        </div>
+        <button onclick="addToCart('Exam Pad Pack', parseFloat(this.closest('.product-card').dataset.price)); event.stopPropagation();">Add to Cart</button>
     </div>
-    <div class="product-card">
+
+    <!-- Deluxe Pack -->
+    <div class="product-card" data-price="299.99" onclick="showProductDetails('Deluxe Stationery Pack')">
         <img src="https://via.placeholder.com/300" alt="Deluxe Stationery Pack">
         <h3>Deluxe Stationery Pack</h3>
-        <p>R299.99</p>
-        <button onclick="addToCart('Deluxe Stationery Pack', 299.99)">Add to Cart</button>
+        
+        <div class="price-row">
+            <span class="new-price">R299.99</span>
+            <span class="old-price" aria-hidden="true"></span>
+        </div>
+       <button onclick="addToCart('Deluxe Pack', parseFloat(this.closest('.product-card').dataset.price)); event.stopPropagation();">Add to Cart</button>
     </div>
-    <div class="product-card">
+
+    <!-- Pencil Pack -->
+    <div class="product-card" data-price="99.99" onclick="showProductDetails('Pencil Pack')">
         <img src="https://via.placeholder.com/300" alt="Pencil Pack">
         <h3>Pencil Pack</h3>
-        <p>R99.99</p>
-        <button onclick="addToCart('Pencil Pack', 99.99)">Add to Cart</button>
+        
+        <div class="price-row">
+            <span class="new-price">R99.99</span>
+            <span class="old-price" aria-hidden="true"></span>
+        </div>
+        <button onclick="addToCart('Pencil Pack', parseFloat(this.closest('.product-card').dataset.price)); event.stopPropagation();">Add to Cart</button>
     </div>
-    <div class="product-card">
+
+    <!-- Ruler Set -->
+    <div class="product-card" data-price="89.99" onclick="showProductDetails('Ruler Set')">
         <img src="https://via.placeholder.com/300" alt="Ruler Set">
         <h3>Ruler Set</h3>
-        <p>R89.99</p>
-        <button onclick="addToCart('Ruler Set', 89.99)">Add to Cart</button>
+        
+        <div class="price-row">
+            <span class="new-price">R89.99</span>
+            <span class="old-price" aria-hidden="true"></span>
+        </div>
+        <button onclick="addToCart('Ruler Set', parseFloat(this.closest('.product-card').dataset.price)); event.stopPropagation();">Add to Cart</button>
     </div>
-    <div class="product-card">
+
+    <!-- Art Starter Kit -->
+    <div class="product-card" data-price="189.99" onclick="showProductDetails('Art Starter Kit')">
         <img src="https://via.placeholder.com/300" alt="Art Starter Kit">
         <h3>Art Starter Kit</h3>
-        <p>R189.99</p>
-        <button onclick="addToCart('Art Starter Kit', 189.99)">Add to Cart</button>
+        
+        <div class="price-row">
+            <span class="new-price">R189.99</span>
+            <span class="old-price" aria-hidden="true"></span>
+        </div>
+        <button onclick="addToCart('Art Starter Kit', parseFloat(this.closest('.product-card').dataset.price)); event.stopPropagation();">Add to Cart</button>
     </div>
+
 </section>
 
 <div class="contact">
@@ -256,11 +381,164 @@ footer {
     <button class="checkout-btn" onclick="checkout()">Checkout</button>
 </div>
 
+<!-- PRODUCT DETAILS MODAL -->
+<div id="product-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">×</span>
+        <h2 id="modal-title"></h2>
+        <ul id="modal-items"></ul>
+    </div>
+</div>
+
 <footer>
     © 2025 Back to School Essentials — All Rights Reserved
 </footer>
 
 <script>
+// Product item lists
+const productDetails = {
+    "A4 School Pack": [
+        "2 × A4 Exercise Books",
+        "1 × Ruler",
+        "1 × Pencil Set (6 pack)",
+        "1 × Eraser",
+        "1 × Sharpener"
+    ],
+    "Maths Set": [
+        "Compass",
+        "Protractor",
+        "Set Squares",
+        "Pencil",
+        "Tin Case"
+    ],
+    "Colouring Pack": [
+        "24 × Colour Pencils",
+        "12 × Twist Crayons",
+        "Sketch Pad"
+    ],
+    "Exam Pad Pack": [
+        "2 × Exam Pads",
+        "Pen Set (Blue/Black)",
+        "Highlighter"
+    ],
+    "Deluxe Stationery Pack": [
+        "4 × A4 Books",
+        "24 × Colour Pencils",
+        "Pencil Set",
+        "Glue Stick",
+        "Scissors",
+        "Highlighters"
+    ],
+    "Pencil Pack": [
+        "10 × HB Pencils",
+        "Sharpener",
+        "Eraser"
+    ],
+    "Ruler Set": [
+        "30cm Ruler",
+        "15cm Ruler",
+        "Protractor"
+    ],
+    "Art Starter Kit": [
+        "Paint Brush Set",
+        "Watercolour Paint",
+        "Sketch Pad",
+        "Apron"
+    ]
+};
+
+// Call once on page load to generate old (struck) prices as 30% above current
+function applyPriceDrops() {
+  // Select all product cards that have a data-price attribute
+  document.querySelectorAll('.product-card[data-price]').forEach(card => {
+    const priceStr = card.dataset.price;                         // "199.99"
+    const price = parseFloat(priceStr);
+    if (isNaN(price)) return;
+
+    // compute old price = 30% higher
+    const oldPrice = (price * 1.3);
+    const oldPriceText = 'R' + oldPrice.toFixed(2);
+
+    // find the old-price span and new-price span
+    const oldEl = card.querySelector('.old-price');
+    const newEl = card.querySelector('.new-price');
+
+    if (oldEl) {
+      oldEl.textContent = oldPriceText;
+      // subtle pop effect to draw attention
+      oldEl.classList.remove('pop');
+      void oldEl.offsetWidth; // trigger reflow for repeated animation
+      oldEl.classList.add('pop');
+    }
+
+    // ensure new-price displays correctly (in case markup mismatch)
+    if (newEl) {
+      newEl.textContent = 'R' + price.toFixed(2);
+    }
+  });
+}
+
+// run on load
+document.addEventListener('DOMContentLoaded', function() {
+  applyPriceDrops();
+});
+
+
+// Show modal
+function showProductDetails(name) {
+    document.getElementById("modal-title").textContent = name;
+
+    let itemsHTML = productDetails[name]
+        .map((item, index) => `
+        <li>
+           <input type="checkbox" id="${name}-item-${index}" data-item="${item}" checked>
+           <label for="${name}-item-${index}">${item}</label>
+        </li>
+        `)
+        .join("");
+
+    document.getElementById("modal-items").innerHTML = itemsHTML;
+
+    document.getElementById("product-modal").style.display = "flex";
+
+    if (!document.getElementById("add-selected-btn")) {
+        const btn = document.createElement("button");
+        btn.id = "add-selected-btn";
+        btn.textContent = "Add Selected Items to Cart";
+        btn.style.cssText = "margin-top:15px;padding:10px 20px;background:#3b82f6;color:white;border:none;border-radius:6px;cursor:pointer;";
+        btn.onclick = function() { addSelectedToCart(name); };
+        document.querySelector(".modal-content").appendChild(btn);
+    }
+}
+function addSelectedToCart(packName) {
+    const selectedItems = Array.from(
+        document.querySelectorAll(`#product-modal input[type="checkbox"]:checked`)
+    ).map(cb => cb.dataset.item);
+
+    if (selectedItems.length === 0) {
+        alert("Please select at least one item to add.");
+        return;
+    }
+
+    // Calculate price per item (optional: divide pack price by total items)
+    const packCard = Array.from(document.querySelectorAll('.product-card'))
+        .find(c => c.querySelector('h3').textContent === packName);
+    const packPrice = parseFloat(packCard.dataset.price);
+
+    const pricePerItem = packPrice / productDetails[packName].length;
+
+    selectedItems.forEach(item => {
+        addToCart(item, pricePerItem);
+    });
+
+    closeModal();
+}
+
+// Close modal
+function closeModal() {
+    document.getElementById("product-modal").style.display = "none";
+}
+
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
 function saveCart() { localStorage.setItem("cart", JSON.stringify(cart)); }
@@ -322,4 +600,9 @@ updateCart();
 </script>
 
 </body>
+<!-- Floating sale banner -->
+<div class="sale-banner">
+    Order now while stocks last!!! Sale ends on the 15th of December!!! 
+</div>
+
 </html>
