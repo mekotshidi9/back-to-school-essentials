@@ -1,1 +1,0 @@
-# back-to-school-essentials
