@@ -84,9 +84,12 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    position: relative;
 
+    position: sticky; /* or 'fixed' */
+    top: 0;
+    z-index: 2500; /* ABOVE the side-menu */
 }
+
 
 header h1 {
     margin-left: 60px;
@@ -419,117 +422,151 @@ footer {
 <footer>
     © Copyright 2025 Eminent Services — All Rights Reserved
 </footer>
-
 <script>
-/* PRICE LIST FOR EACH ITEM */
+/* --------------------------
+   PRICE LIST FOR EACH ITEM
+   (keys must match productDetails item names AFTER the "×")
+   -------------------------- */
 const itemPrices = {
-    "1 × Bic Clic pen": 9.75,
-    "1 × Bic Orange fine point": 6.63,
-    "1 × Faber Castell Cap pen": 4.94,
-    "1 × Staedler pencil": 13.26,
-    "1 × Faber Castell pencil": 9.36,
-    "1 x Colured pens": 51.22,
-    "1 x Scissors Stainless": 10.01,
-    "1 x Permanent Marker": 70.07,
-    "1 x Eraser": 7.15,
-    "1 x Retractable Wax Crayons": 86.19,
-    "1 x Highlighters (6 Pck)": 47.45,
-    "1 x Staedler Colouring Pencils (12 Pck)": 50.18,
-    "1 x Faber Castell Colouring Pencils (12 Pck)": 47.71,
-    "1 × Pritt Glue (43g)": 60.19,
-    "1 x Steadler Glue (40g)": 31.07,
-    "1 × Tower Star Stickers": 14.04,
-    "1 x Ruler Flexible": 10.66,
-    "1 x Rim of Paper": 115.70,
-    "1 × A4 Quad and Margin 192 pg": 27.56,
-    "1 x A4 Quad and Margin 72 pg": 7.02,
-    "1 × A4 Feint and Margin 192 pg": 26.61,
-    "1 x A4 Feint and Margin 72 pg": 6.63,
-    "1 × Flip file (20 pockets)": 25.35,
-    "1 × Flip file (50 pockets)": 38.87,
-    "1 x Sharpener (with holder)": 13.13,
-    "1 × Labels": 58.50,
-    "1 × Caddy Bag": 1300,
-    "1 × Pencil Case": 33.93,
-    "1 × Tissue Box (200)": 31.72,
-    "1 × Antibacterial Wipes": 40.56,
-    "1 × Afrikaans Dictionary": 264.55
+    "Bic Clic pen": 9.75,
+    "Bic Orange fine point": 6.63,
+    "Faber Castell Cap pen": 4.94,
+    "Staedler pencil": 13.26,
+    "Faber Castell pencil": 9.36,
+    "Coloured pens": 51.22,
+    "Scissors Stainless": 10.01,
+    "Permanent Marker": 70.07,
+    "Eraser": 7.15,
+    "Retractable Wax Crayons": 86.19,
+    "Highlighters (6 Pck)": 47.45,
+    "Staedler Colouring Pencils (12 Pck)": 50.18,
+    "Faber Castell Colouring Pencils (12 Pck)": 47.71,
+    "Pritt Glue (43g)": 60.19,
+    "Steadler Glue (40g)": 31.07,
+    "Tower Star Stickers": 14.04,
+    "Ruler Flexible": 10.66,
+    "Rim of Paper": 115.70,
+    "A4 Quad and Margin 192 pg": 27.56,
+    "A4 Quad and Margin 72 pg": 7.02,
+    "A4 Feint and Margin 192 pg": 26.61,
+    "A4 Feint and Margin 72 pg": 6.63,
+    "Flip file (20 pockets)": 25.35,
+    "Flip file (50 pockets)": 38.87,
+    "Sharpener (with holder)": 13.13,
+    "Labels": 58.50,
+    "Caddy Bag": 1300,
+    "Pencil Case": 33.93,
+    "Tissue Box (200)": 31.72,
+    "Antibacterial Wipes": 40.56,
+    "Afrikaans Dictionary": 264.55
 };
 
-/* SIDE MENU TOGGLE */
-document.getElementById("menu-btn").onclick = function() {
-    document.getElementById("side-menu").classList.toggle("open");
-};
+/* Helper: parse an item string like "4 × Bic Clic pen" */
+function parseItemString(itemStr) {
+    // Some items may not include "×" — handle gracefully
+    if (!itemStr || typeof itemStr !== "string") return { quantity: 0, name: "" };
 
-/* PRODUCT DETAILS */
+    const parts = itemStr.split("×");
+    if (parts.length === 1) {
+        // No quantity specified: assume 1
+        return { quantity: 1, name: parts[0].trim() };
+    }
+
+    // left = quantity, right = name
+    const qtyStr = parts[0].trim();
+    const name = parts.slice(1).join("×").trim(); // in case name had an ×
+    const qty = parseInt(qtyStr, 10);
+    return { quantity: isNaN(qty) ? 1 : qty, name };
+}
+
+/* MAIN: calculate price for an array of items (each "Q × Name") */
+function calculatePackPriceFromItems(items) {
+    let total = 0;
+    items.forEach(itemStr => {
+        const { quantity, name } = parseItemString(itemStr);
+        const pricePerUnit = itemPrices[name] || 0;
+        total += quantity * pricePerUnit;
+    });
+    return total;
+}
+
+/* Convenience: calculate by pack name */
+function calculatePackPrice(packName) {
+    const items = productDetails[packName] || [];
+    return calculatePackPriceFromItems(items);
+}
+
+/* --------------------------
+   PRODUCT DETAILS (edit quantities here)
+   -------------------------- */
 const productDetails = {
     "Quarter Pack": [
-        "1 × Bic Clic pen",
-        "1 × Staedler pencil",
-        "1 x Colured pens",
-        "1 x Scissors Stainless",
-        "1 x Permanent Marker",
-        "1 x Eraser",
-        "1 x Retractable Wax Crayons",
-        "1 x Highlighters (6 Pck)",
-        "1 x Staedler Colouring Pencils (12 Pck)",
-        "1 x Steadler Glue (40g)",
+        "4 × Bic Clic pen",
+        "4 × Staedler pencil",
+        "1 × Coloured pens",
+        "1 × Scissors Stainless",
+        "1 × Permanent Marker",
+        "1 × Eraser",
+        "1 × Retractable Wax Crayons",
+        "1 × Highlighters (6 Pck)",
+        "1 × Staedler Colouring Pencils (12 Pck)",
+        "1 × Steadler Glue (40g)",
         "1 × Tower Star Stickers",
-        "1 x Ruler Flexible",
-        "1 x Rim of Paper",
+        "1 × Ruler Flexible",
+        "1 × Rim of Paper",
         "1 × A4 Quad and Margin 192 pg",
-        "1 x A4 Quad and Margin 72 pg",
+        "1 × A4 Quad and Margin 72 pg",
         "1 × A4 Feint and Margin 192 pg",
-        "1 x A4 Feint and Margin 72 pg",
+        "1 × A4 Feint and Margin 72 pg",
         "1 × Flip file (20 pockets)",
-        "1 x Sharpener (with holder)",
+        "1 × Sharpener (with holder)",
         "1 × Labels"
     ],
 
     "2 Quarter Pack": [
-        "1 × Faber Castell Cap pen",
-        "1 × Faber Castell pencil",
-        "1 x Colured pens",
-        "1 x Scissors Stainless",
-        "1 x Permanent Marker",
-        "1 x Eraser",
-        "1 x Retractable Wax Crayons",
-        "1 x Highlighters (6 Pck)",
-        "1 x Faber Castell Colouring Pencils (12 Pck)",
-        "2 × Pritt Glue (43g)",
+        "8 × Faber Castell Cap pen",
+        "8 × Faber Castell pencil",
+        "1 × Coloured pens",
+        "1 × Scissors Stainless",
+        "1 × Permanent Marker",
+        "1 × Eraser",
+        "1 × Retractable Wax Crayons",
+        "1 × Highlighters (6 Pck)",
+        "1 × Faber Castell Colouring Pencils (12 Pck)",
+        "4 × Pritt Glue (43g)",
         "1 × Tower Star Stickers",
-        "1 x Ruler Flexible",
-        "1 x Rim of Paper",
+        "1 × Ruler Flexible",
+        "1 × Rim of Paper",
         "1 × A4 Quad and Margin 192 pg",
-        "1 x A4 Quad and Margin 72 pg",
-        "1 x A4 Feint and Margin 192 pg",
-        "1 x A4 Feint and Margin 72 pg",
+        "1 × A4 Quad and Margin 72 pg",
+        "1 × A4 Feint and Margin 192 pg",
+        "1 × A4 Feint and Margin 72 pg",
         "1 × Flip file (50 pockets)",
-        "1 x Sharpener (with holder)",
+        "1 × Sharpener (with holder)",
         "1 × Labels"
     ],
 
     "Full Package": [
-        "1 × Bic Orange fine point",
-        "1 × Faber Castell pencil",
-        "1 x Colured pens",
-        "1 x Scissors Stainless",
-        "1 x Permanent Marker",
-        "1 x Eraser",
-        "1 x Retractable Wax Crayons",
-        "1 x Highlighters (6 Pck)",
-        "1 x Faber Castell Colouring Pencils (12 Pck)",
-        "1 × Pritt Glue (43g)",
+        "16 × Bic Orange fine point",
+        "8 × Faber Castell pencil",
+        "1 × Coloured pens",
+        "1 × Scissors Stainless",
+        "1 × Permanent Marker",
+        "2 × Eraser",
+        "1 × Retractable Wax Crayons",
+        "1 × Highlighters (6 Pck)",
+        "1 × Faber Castell Colouring Pencils (12 Pck)",
+        "8 × Pritt Glue (43g)",
         "1 × Tower Star Stickers",
-        "1 x Ruler Flexible",    
-        "1 x Rim of Paper",
-        "1 × A4 Quad and Margin 192 pg",
-        "1 x A4 Quad and Margin 72 pg",
-        "1 × A4 Feint and Margin 192 pg",
-        "1 x A4 Feint and Margin 72 pg",
+        "1 × Ruler Flexible",
+        "1 × Rim of Paper",
+        "4 × A4 Quad and Margin 192 pg",
+        "4 × A4 Quad and Margin 72 pg",
+        "4 × A4 Feint and Margin 192 pg",
+        "4 × A4 Feint and Margin 72 pg",
         "1 × Flip file (20 pockets)",
         "1 × Flip file (50 pockets)",
-        "1 x Sharpener (with holder)",
+        "1 × Sharpener (with holder)",
         "1 × Labels",
         "1 × Pencil Case",
         "1 × Tissue Box (200)",
@@ -543,26 +580,26 @@ const productDetails = {
         "1 × Faber Castell Cap pen",
         "1 × Staedler pencil",
         "1 × Faber Castell pencil",
-        "1 x Colured pens",
-        "1 x Scissors Stainless",
-        "1 x Permanent Marker",
-        "1 x Eraser",
-        "1 x Retractable Wax Crayons",
-        "1 x Highlighters (6 Pck)",
-        "1 x Staedler Colouring Pencils (12 Pck)",
-        "1 x Faber Castell Colouring Pencils (12 Pck)",
+        "1 × Coloured pens",
+        "1 × Scissors Stainless",
+        "1 × Permanent Marker",
+        "1 × Eraser",
+        "1 × Retractable Wax Crayons",
+        "1 × Highlighters (6 Pck)",
+        "1 × Staedler Colouring Pencils (12 Pck)",
+        "1 × Faber Castell Colouring Pencils (12 Pck)",
         "1 × Pritt Glue (43g)",
-        "1 x Staedler Glue (40g)",
+        "1 × Steadler Glue (40g)",
         "1 × Tower Star Stickers",
-        "1 x Ruler Flexible",
-        "1 x Rim of Paper",
+        "1 × Ruler Flexible",
+        "1 × Rim of Paper",
         "1 × A4 Quad and Margin 192 pg",
-        "1 x A4 Quad and Margin 72 pg",
+        "1 × A4 Quad and Margin 72 pg",
         "1 × A4 Feint and Margin 192 pg",
-        "1 x A4 Feint and Margin 72 pg",
+        "1 × A4 Feint and Margin 72 pg",
         "1 × Flip file (20 pockets)",
         "1 × Flip file (50 pockets)",
-        "1 x Sharpener (with holder)",
+        "1 × Sharpener (with holder)",
         "1 × Labels",
         "1 × Caddy Bag",
         "1 × Pencil Case",
@@ -572,63 +609,112 @@ const productDetails = {
     ]
 };
 
-
-function showProductDetails(name) {
-    document.getElementById("modal-title").textContent = name;
-
-    let itemsHTML = productDetails[name].map(
-    (item, index) => `
-        <li>
-            <input type="checkbox" 
-                   id="${name}-item-${index}" 
-                   data-item="${item}" 
-                   checked 
-                   onchange="updateTotal()">
-            <label for="${name}-item-${index}">${item}</label>
-        </li>
-    `
-).join("");
-
-/* RECALCULATE TOTAL PACK PRICE */
-function updateTotal() {
-    let total = 0;
-
-    document.querySelectorAll("#modal-items input[type='checkbox']").forEach(box => {
-        if (box.checked) {
-            let itemName = box.dataset.item;
-            if (itemPrices[itemName]) {
-                total += itemPrices[itemName];
-            }
-        }
-    });
-
-    document.getElementById("modal-total").textContent = "R" + total;
+/* --------------------------
+   SIDE MENU TOGGLE
+   -------------------------- */
+const menuBtn = document.getElementById("menu-btn");
+if (menuBtn) {
+    menuBtn.onclick = function() {
+        const side = document.getElementById("side-menu");
+        if (side) side.classList.toggle("open");
+    };
 }
 
-    document.getElementById("modal-items").innerHTML = itemsHTML;
-    document.getElementById("product-modal").style.display = "flex";
+/* --------------------------
+   MODAL: showProductDetails + modal item handling
+   -------------------------- */
+function showProductDetails(name) {
+    const titleEl = document.getElementById("modal-title");
+    if (titleEl) titleEl.textContent = name;
 
+    const items = productDetails[name] || [];
+    // Build items list with checkboxes
+    const itemsHTML = items.map((item, index) => {
+        return `
+        <li>
+            <input type="checkbox"
+                   id="${name}-item-${index}"
+                   data-item="${item}"
+                   checked
+                   onchange="modalUpdateTotal('${name}')">
+            <label for="${name}-item-${index}">${item}</label>
+        </li>
+        `;
+    }).join("");
+
+    const modalItems = document.getElementById("modal-items");
+    if (modalItems) modalItems.innerHTML = itemsHTML;
+
+    // show modal
+    const productModal = document.getElementById("product-modal");
+    if (productModal) productModal.style.display = "flex";
+
+    // add Add Selected Items button if not present
     if (!document.getElementById("add-selected-btn")) {
         const btn = document.createElement("button");
         btn.id = "add-selected-btn";
         btn.textContent = "Add Selected Items";
         btn.style.cssText = "margin-top:15px;padding:10px 20px;background:#3b82f6;color:white;border:none;border-radius:6px;cursor:pointer;";
         btn.onclick = function() { addSelectedToCart(name); };
-        document.querySelector(".modal-content").appendChild(btn);
+        const modalContent = document.querySelector(".modal-content");
+        if (modalContent) modalContent.appendChild(btn);
     }
+
+    // ensure total is shown correctly on open
+    modalUpdateTotal(name);
 }
 
-function closeModal() {
-    document.getElementById("product-modal").style.display = "none";
+/* modal: calculate total for checked items (respect quantities) */
+function modalUpdateTotal(packName) {
+    const modalItems = document.querySelectorAll(`#modal-items input[type='checkbox']`);
+    let total = 0;
+    modalItems.forEach(box => {
+        if (box.checked) {
+            const itemStr = box.dataset.item;
+            const { quantity, name } = parseItemString(itemStr);
+            const pricePerUnit = itemPrices[name] || 0;
+            total += quantity * pricePerUnit;
+        }
+    });
+    const totalEl = document.getElementById("modal-total");
+    if (totalEl) totalEl.textContent = "R" + total.toFixed(2);
 }
 
-/* ADD TO CART */
+/* Add checked items as a single cart entry (custom selection) */
+function addSelectedToCart(packName) {
+    const modalItems = document.querySelectorAll(`#modal-items input[type='checkbox']`);
+    let selectedItems = [];
+    let total = 0;
+
+    modalItems.forEach(box => {
+        if (box.checked) {
+            const itemStr = box.dataset.item;
+            selectedItems.push(itemStr);
+            const { quantity, name } = parseItemString(itemStr);
+            const pricePerUnit = itemPrices[name] || 0;
+            total += quantity * pricePerUnit;
+        }
+    });
+
+    if (selectedItems.length === 0) return alert("Please select at least one item.");
+
+    // create an entry in cart with aggregated price
+    const displayName = `${packName} (custom)`;
+    addToCart(displayName, total);
+    closeModal();
+}
+
+/* --------------------------
+   CART FUNCTIONS
+   -------------------------- */
 let cart = JSON.parse(localStorage.getItem("cart") || "[]");
 
 function saveCart() { localStorage.setItem("cart", JSON.stringify(cart)); }
 
 function updateCart() {
-    document.getElementById("cart-count").textContent = cart.length;
+    const countEl = document.getElementById("cart-count");
+    if (countEl) countEl.textContent = cart.reduce((s, i) => s + i.quantity, 0);
+
     let html = "";
     let total = 0;
 
@@ -647,8 +733,11 @@ function updateCart() {
         `;
     });
 
-    document.getElementById("cart-items").innerHTML = html;
-    document.getElementById("cart-total").textContent = total.toFixed(2);
+    const cartItemsEl = document.getElementById("cart-items");
+    if (cartItemsEl) cartItemsEl.innerHTML = html;
+
+    const cartTotalEl = document.getElementById("cart-total");
+    if (cartTotalEl) cartTotalEl.textContent = total.toFixed(2);
 }
 
 function addToCart(name, price) {
@@ -666,38 +755,53 @@ function decreaseQty(i) { if(cart[i].quantity>1) cart[i].quantity--; saveCart();
 
 function toggleCart() {
     const panel = document.getElementById("cart-panel");
-    panel.classList.toggle("open");
+    if (panel) panel.classList.toggle("open");
     updateCart();
 }
-function calculatePackPrice(packName) {
-    let items = productDetails[packName];
-    let total = 0;
 
-    items.forEach(item => {
-        let price = itemPrices[item];
-        if (!isNaN(price)) total += price;
-    });
-
-    return total;
-}
+/* --------------------------
+   PAGE INIT: set card prices, attach handlers
+   -------------------------- */
 document.addEventListener("DOMContentLoaded", function() {
+    // Set price on product cards and add click handlers for add-to-cart buttons
     document.querySelectorAll(".product-card").forEach(card => {
-        let pack = card.dataset.pack;
+        const pack = card.dataset.pack;
         if (pack) {
-            let total = calculatePackPrice(pack);
-            card.querySelector(".new-price").textContent = "R" + total.toFixed(2);
+            const total = calculatePackPrice(pack);
+            const priceEl = card.querySelector(".new-price");
+            if (priceEl) priceEl.textContent = "R" + total.toFixed(2);
 
-            card.querySelector(".add-to-cart-btn").onclick = function(event) {
-                event.stopPropagation();
-                addToCart(pack, total);
+            const addBtn = card.querySelector(".add-to-cart-btn");
+            if (addBtn) {
+                addBtn.onclick = function(event) {
+                    event.stopPropagation();
+                    addToCart(pack, total);
+                };
+            }
+
+            // When card is clicked show modal (if intended)
+            card.onclick = function() {
+                showProductDetails(pack);
             };
         }
     });
+
+    // Populate cards that use data-price attribute (price drop)
+    applyPriceDrops();
+
+    // update cart display
+    updateCart();
+
+    // update pack price displays (in case you have specific price elements elsewhere)
+    updatePackPrice("Quarter Pack");
+    updatePackPrice("2 Quarter Pack");
+    updatePackPrice("Full Package");
+    updatePackPrice("Customised Pack");
 });
 
-
-
-/* AUTO PRICE DROP */
+/* --------------------------
+   PRICE DROP UTILS (keeps previous functionality)
+   -------------------------- */
 function applyPriceDrops() {
     document.querySelectorAll('.product-card[data-price]').forEach(card => {
         const price = parseFloat(card.dataset.price);
@@ -710,9 +814,24 @@ function applyPriceDrops() {
     });
 }
 
-applyPriceDrops();
+/* Utility to update any price element with id "price-Pack-Name" */
+function updatePackPrice(packName) {
+    const items = productDetails[packName] || [];
+    const total = calculatePackPriceFromItems(items);
+    const priceElementId = "price-" + packName.replace(/ /g, "-");
+    const priceElement = document.getElementById(priceElementId);
+    if (priceElement) priceElement.innerText = "R" + total.toFixed(2);
+}
 
+/* --------------------------
+   MODAL CLOSE
+   -------------------------- */
+function closeModal() {
+    const productModal = document.getElementById("product-modal");
+    if (productModal) productModal.style.display = "none";
+}
 </script>
+
 
 </body>
 </html>
