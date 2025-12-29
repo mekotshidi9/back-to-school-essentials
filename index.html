@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&display=swap" rel="stylesheet">
+
+<style>
+
+/* Hamburger Button */
+.hamburger {
+    font-size: 28px;
+    cursor: pointer;
+    padding: 0px;
+    position: fixed;
+    left: 10px;
+    top: 10px;
+    z-index: 3000;
+}
+
+/* SIDE MENU */
+#side-menu {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 220px;
+  height: 100%;
+  background: #ffffff;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.12);
+  padding-top: 60px;
+  z-index: 1600;
+  transform: translateX(-100%);
+  transition: transform 330ms cubic-bezier(.22,.9,.3,1);
+}
+
+#side-menu.open {
+  transform: translateX(0);
+}
+
+#side-menu a {
+    padding: 15px;
+    display: block;
+    text-decoration: none;
+    color: #333;
+    font-size: 18px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+#side-menu a:hover {
+    background: #f2f2f2;
+}
+
+/* Price effects */
+.price-row { margin: 8px 0; display:flex; justify-content:center; align-items:center; gap:10px; }
+.old-price {
+  color: #888;
+  text-decoration: line-through;
+  font-size: 0.95rem;
+  opacity: 0.95;
+  transition: transform .25s ease, opacity .25s ease;
+}
+.new-price {
+  color: #e11d48;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+.pop { animation: pop 260ms ease; }
+@keyframes pop {
+  0% { transform: scale(0.95); opacity: 0; }
+  60% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+body { margin: 0; font-family: Arial, sans-serif; background: #f8f8f8; }
+
+/* Header */
+header {
+    background: #60a5fa;
+    color: #fff;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    position: sticky; /* or 'fixed' */
+    top: 0;
+    z-index: 2500; /* ABOVE the side-menu */
+}
+
+
+header h1 {
+    margin-left: 60px;
+    font-size: 52px;
+    font-family: 'Baloo 2', cursive;
+}
+
+.top-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    position: relative;
+    z-index: 2000;
+}
+
+.site-title {
+    margin: 0;
+    font-size: 24px;
+    text-align: center;
+    flex: 1;
+    padding-left: 20px;
+}
+
+.cart-count {
+    background: red;
+    color: white;
+    font-size: 12px;
+    padding: 3px 7px;
+    border-radius: 50%;
+    margin-left: 5px;
+}
+
+/* Hero */
+.hero {
+    position: relative;
+    text-align: center;
+    padding: 80px 20px;
+    overflow: hidden;
+    color: #000;
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('BackgroundPicture.jpg') center/cover no-repeat;
+    opacity: 0.4;
+    z-index: 0;
+}
+
+.hero h2,
+.hero p {
+    position: relative;
+    z-index: 1;
+    font-family: 'Baloo 2', cursive;
+}
+
+.hero h2 { font-size: 50px; }
+.hero p { font-size: 18px; }
+
+/* Product grid */
+.products {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 40px;
+    max-width: 1200px;
+    margin: auto;
+}
+
+.product-card {
+    background-color: #FFF9C4;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-align: center;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.product-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    background-color: #f0f0f0;
+}
+
+.product-card h3 {
+    font-family: 'Baloo 2', cursive;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.product-card p {
+    font-family: 'Baloo 2', cursive;
+    color: #333;
+}
+
+/* Add to Cart Button */
+.product-card .add-to-cart-btn {
+    background-color: #3b82f6;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Baloo 2', cursive;
+}
+
+.product-card .add-to-cart-btn:hover {
+    background-color: #2563eb;
+}
+
+/* CART PANEL – FIXED & CLEAN */
+#cart-panel {
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 320px;
+    height: 100%;
+    background: white;
+    box-shadow: -4px 0 10px rgba(0,0,0,0.2);
+    padding: 20px;
+    transform: translateX(100%);
+    transition: transform 330ms cubic-bezier(.22,.9,.3,1);
+    overflow-y: auto;
+    z-index: 999999;
+}
+
+#cart-panel.open {
+    transform: translateX(0);
+}
+
+.cart-item {
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    width: 90%;
+    max-width: 400px;
+    border-radius: 10px;
+}
+.checkout-btn {
+    background-color: #16a34a; /* brighter green */
+    color: white;
+    padding: 16px 20px;         /* bigger padding */
+    width: 100%;
+    border: none;
+    border-radius: 10px;        /* more rounded */
+    margin-top: 20px;
+    font-size: 22px;            /* bigger text */
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.checkout-btn:hover {
+    background-color: #15803d;  /* darker green on hover */
+    transform: scale(1.05);     /* subtle pop effect */
+}
+
+.close-btn {
+    float: right;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+footer {
+    background: #1e3a8a;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+}
+
+.sale-banner {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: #dc2626;
+    color: white;
+    text-align: center;
+    padding: 12px 0;
+    font-size: 18px;
+    z-index: 9999;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- HAMBURGER MENU -->
+<div id="menu-btn" class="hamburger">☰</div>
+
+<nav id="side-menu">
+    <a href="index.html">Home</a>
+    <a href="#shop">Shop</a>
+    <a href="#about">About</a>
+    <a href="contact.html">Contact</a>
+</nav>
+
+<header class="top-header">
+    <h1 class="site-title">Eminent Services</h1>
+
+    <div id="cart-icon" onclick="toggleCart()" style="cursor:pointer;">
+        🛒 <span id="cart-count">0</span>
+    </div>
+</header>
+
+<section>
+    <div class="hero">
+        <h2>Affordable Stationery Packs for Parents & Schools</h2>
+        <p>Quality stationery delivered nationwide.</p>
+
+        <p class="custom-note" style="font-size: 20px; margin-top: 8px; font-weight: bold;">
+            FOR A CUSTOMIZED STATIONERY PACK, CONTACT US ON:
+            <br>
+            <a href="https://wa.me/27713535297"
+               style="font-size: 22px; font-weight: bold; text-decoration:none;">
+                071 3535 297
+            </a>
+        </p>
+    </div>
+</section>
+
+<!-- PRODUCTS -->
+<section class="products">
+
+<div class="product-card" data-pack="Quarter Pack" onclick="showProductDetails('Quarter Pack')">
+  <img src="QuarterPack.jpg" alt="Quarter Pack">
+  <h3>Quarter Pack</h3>
+  <div class="price-row">
+      <span class="new-price" id= "price-Quarter-Pack">R0 </span>
+      <span class="old-price"></span>
+  </div>
+  <button class="add-to-cart-btn">Add to Cart</button>
+
+</div>
+
+<div class="product-card" data-pack="2 Quarter Pack" onclick="showProductDetails('2 Quarter Pack')">
+  <img src="StandardPack.jpg" alt="2 Quarter Pack">
+  <h3>2 Quarter Pack</h3>
+  <div class="price-row">
+      <span class="new-price" id= "price-2-Quarter-Pack">R0</span>
+      <span class="old-price"></span>
+  </div>
+  <button class="add-to-cart-btn">Add to Cart</button>
+
+</div>
+
+<div class="product-card" data-pack="Full Package" onclick="showProductDetails('Full Package')">
+  <img src="FullPack.jpg" alt="Full Package">
+  <h3>Full Package</h3>
+  <div class="price-row">
+      <span class="new-price" id="price-Full-Package">R0</span>
+      <span class="old-price"></span>
+  </div>
+ <button class="add-to-cart-btn">Add to Cart</button>
+
+</div>
+
+<div class="product-card" data-pack="Customised Pack" onclick="showProductDetails('Customised Pack')">
+  <img src="CustomisedPack.jpg" alt="Customised Pack">
+  <h3>Customised Pack</h3>
+  <div class="price-row">
+      <span class="new-price" id="price-Customised-Pack">R0</span>
+      <span class="old-price"></span>
+  </div>
+  <button class="add-to-cart-btn">Add to Cart</button>
+</div>
+
+</section>
+
+<!-- INFO TEXT -->
+<div class="contact" style="text-align: center; font-family: 'Baloo 2', cursive;">
+    <p><strong style="color:black;">We deliver nationwide</strong></p>
+    <p style="color:#3b82f6;">Prices may vary based on your custom package.</p>
+    <p style="color:#3b82f6;">We will provide a personalised quote for your needs!</p>
+</div>
+
+<!-- CART PANEL -->
+<div id="cart-panel">
+    <button onclick="toggleCart()" style="float:right; background:red; color:white; border:none; padding:5px 10px; border-radius:5px;">Close ×</button>
+    <h3>Your Cart</h3>
+    <div id="cart-items"></div>
+    <h3>Total: R<span id="cart-total">0.00</span></h3>
+    <button class="checkout-btn" onclick="checkout()">Checkout</button>
+</div>
+
+<!-- MODAL -->
+<div id="product-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">×</span>
+        <h2 id="modal-title"></h2>
+        <ul id="modal-items"></ul>
+        <p style="margin-top:15px;font-weight:bold;">Total: <span id="modal-total">R0</span></p>
+    </div>
+</div>
+
+<footer>
+    © Copyright 2025 Eminent Services — All Rights Reserved
+</footer>
+
+<script>
+/* --------------------------
+   PRICE LIST FOR EACH ITEM
+-------------------------- */
+const itemPrices = {
+    "Bic Clic pen": 9.75,
+    "Bic Orange fine point": 6.63,
+    "Faber Castell Cap pen": 4.94,
+    "Staedler pencil": 13.26,
+    "Faber Castell pencil": 9.36,
+    "Coloured pens": 51.22,
+    "Scissors Stainless": 10.01,
+    "Permanent Marker": 70.07,
+    "Eraser": 7.15,
+    "Retractable Wax Crayons": 86.19,
+    "Highlighters (6 Pck)": 47.45,
+    "Staedler Colouring Pencils (12 Pck)": 50.18,
+    "Faber Castell Colouring Pencils (12 Pck)": 47.71,
+    "Pritt Glue (43g)": 60.19,
+    "Steadler Glue (40g)": 31.07,
+    "Tower Star Stickers": 14.04,
+    "Ruler Flexible": 10.66,
+    "Ream of Paper": 115.70,
+    "A4 Quad and Margin 192 pg": 27.56,
+    "A4 Quad and Margin 72 pg": 7.02,
+    "A4 Feint and Margin 192 pg": 26.61,
+    "A4 Feint and Margin 72 pg": 6.63,
+    "Flip file (20 pockets)": 25.35,
+    "Flip file (50 pockets)": 38.87,
+    "Sharpener (with holder)": 13.13,
+    "Labels": 58.50,
+    "Caddy Bag": 1300,
+    "Pencil Case": 33.93,
+    "Tissue Box (200)": 31.72,
+    "Antibacterial Wipes": 40.56,
+    "Afrikaans Dictionary": 264.55
+};
+
+/* Helper: parse an item string like "4 × Bic Clic pen" */
+function parseItemString(itemStr) {
+    if (!itemStr || typeof itemStr !== "string") return { quantity: 0, name: "" };
+    const parts = itemStr.split("×");
+    if (parts.length === 1) return { quantity: 1, name: parts[0].trim() };
+    const qty = parseInt(parts[0].trim(), 10);
+    return { quantity: isNaN(qty)? 1 : qty, name: parts.slice(1).join("×").trim() };
+}
+
+/* MAIN: calculate price for an array of items */
+function calculatePackPriceFromItems(items) {
+    let total = 0;
+    items.forEach(itemStr => {
+        const { quantity, name } = parseItemString(itemStr);
+        total += quantity * (itemPrices[name] || 0);
+    });
+    return total;
+}
+
+/* Convenience: calculate by pack name */
+function calculatePackPrice(packName) {
+    const items = productDetails[packName] || [];
+    return calculatePackPriceFromItems(items);
+}
+
+/* --------------------------
+   PRODUCT DETAILS
+-------------------------- */
+const productDetails = {
+    "Quarter Pack": [
+        "4 × Bic Clic pen",
+        "2 × Staedler pencil",
+        "1 × Coloured pens",
+        "1 × Scissors Stainless",
+        "1 × Permanent Marker",
+        "1 × Eraser",
+        "1 × Retractable Wax Crayons",
+        "1 × Highlighters (6 Pck)",
+        "1 × Staedler Colouring Pencils (12 Pck)",
+        "1 × Steadler Glue (40g)",
+        "1 × Tower Star Stickers",
+        "1 × Ruler Flexible",
+        "1 × Ream of Paper",
+        "2 × A4 Feint and Margin 192 pg",
+        "2 × A4 Feint and Margin 72 pg",
+        "1 × Flip file (20 pockets)",
+        "1 × Sharpener (with holder)",
+        "1 × Labels"
+    ],
+
+    "2 Quarter Pack": [
+        "8 × Faber Castell Cap pen",
+        "4 × Faber Castell pencil",
+        "1 × Coloured pens",
+        "1 × Scissors Stainless",
+        "1 × Permanent Marker",
+        "1 × Eraser",
+        "1 × Retractable Wax Crayons",
+        "1 × Highlighters (6 Pck)",
+        "1 × Faber Castell Colouring Pencils (12 Pck)",
+        "4 × Pritt Glue (43g)",
+        "1 × Tower Star Stickers",
+        "1 × Ruler Flexible",
+        "1 × Ream of Paper",
+        "1 × A4 Quad and Margin 72 pg",
+        "2 × A4 Feint and Margin 192 pg",
+        "1 × A4 Feint and Margin 72 pg",
+        "1 × Flip file (50 pockets)",
+        "1 × Sharpener (with holder)",
+        "1 × Labels"
+    ],
+
+    "Full Package": [
+        "16 × Bic Orange fine point",
+        "8 × Faber Castell pencil",
+        "1 × Coloured pens",
+        "2 × Scissors Stainless",
+        "1 × Permanent Marker",
+        "2 × Eraser",
+        "1 × Retractable Wax Crayons",
+        "1 × Highlighters (6 Pck)",
+        "2 × Faber Castell Colouring Pencils (12 Pck)",
+        "10 × Pritt Glue (43g)",
+        "1 × Tower Star Stickers",
+        "4 × Ruler Flexible",
+        "1 × Ream of Paper",
+        "1 × A4 Quad and Margin 192 pg",
+        "5 × A4 Feint and Margin 192 pg",
+        "2 × A4 Feint and Margin 72 pg",
+        "6 × Flip file (20 pockets)",
+        "2 × Sharpener (with holder)",
+        "1 × Labels",
+        "1 × Pencil Case",
+        "2 × Tissue Box (200)",
+        "1 × Antibacterial Wipes",
+        "1 × Afrikaans Dictionary"
+    ],
+
+    "Customised Pack": [
+        "1 × Bic Clic pen",
+        "1 × Bic Orange fine point",
+        "1 × Faber Castell Cap pen",
+        "1 × Staedler pencil",
+        "1 × Faber Castell pencil",
+        "1 × Coloured pens",
+        "1 × Scissors Stainless",
+        "1 × Permanent Marker",
+        "1 × Eraser",
+        "1 × Retractable Wax Crayons",
+        "1 × Highlighters (6 Pck)",
+        "1 × Staedler Colouring Pencils (12 Pck)",
+        "1 × Faber Castell Colouring Pencils (12 Pck)",
+        "1 × Pritt Glue (43g)",
+        "1 × Steadler Glue (40g)",
+        "1 × Tower Star Stickers",
+        "1 × Ruler Flexible",
+        "1 × Ream of Paper",
+        "1 × A4 Quad and Margin 192 pg",
+        "1 × A4 Quad and Margin 72 pg",
+        "1 × A4 Feint and Margin 192 pg",
+        "1 × A4 Feint and Margin 72 pg",
+        "1 × Flip file (20 pockets)",
+        "1 × Flip file (50 pockets)",
+        "1 × Sharpener (with holder)",
+        "1 × Labels",
+        "1 × Caddy Bag",
+        "1 × Pencil Case",
+        "1 × Tissue Box (200)",
+        "1 × Antibacterial Wipes",
+        "1 × Afrikaans Dictionary"
+    ]
+    
+    
+};
+
+/* --------------------------
+   SIDE MENU TOGGLE
+-------------------------- */
+const menuBtn = document.getElementById("menu-btn");
+if (menuBtn) menuBtn.onclick = () => document.getElementById("side-menu").classList.toggle("open");
+
+/* --------------------------
+   MODAL: showProductDetails + modal item handling
+-------------------------- */
+function showProductDetails(name) {
+    const titleEl = document.getElementById("modal-title");
+    if (titleEl) titleEl.textContent = name;
+
+    const items = productDetails[name] || [];
+    const itemsHTML = items.map((item, index) => `
+        <li>
+            <input type="checkbox"
+                   id="${name}-item-${index}"
+                   data-item="${item}"
+                   checked
+                   onchange="modalUpdateTotal('${name}')">
+            <label for="${name}-item-${index}">${item}</label>
+        </li>
+    `).join("");
+
+    const modalItems = document.getElementById("modal-items");
+    if (modalItems) modalItems.innerHTML = itemsHTML;
+
+    modalUpdateTotal(name);
+
+    const modal = document.getElementById("product-modal");
+    if (modal) modal.style.display = "flex";
+}
+
+function closeModal() {
+    const modal = document.getElementById("product-modal");
+    if (modal) modal.style.display = "none";
+}
+
+function modalUpdateTotal(packName) {
+    const selectedItems = Array.from(document.querySelectorAll("#modal-items input[type='checkbox']:checked"))
+                               .map(el => el.dataset.item);
+
+    const total = calculatePackPriceFromItems(selectedItems);
+    const totalEl = document.getElementById("modal-total");
+    if (totalEl) totalEl.textContent = total.toFixed(2);
+}
+
+/* --------------------------
+   CART
+-------------------------- */
+let cart = [];
+
+function addSelectedToCart(packName) {
+    const selectedItems = Array.from(document.querySelectorAll("#modal-items input[type='checkbox']:checked"))
+                               .map(el => el.dataset.item);
+
+    const total = calculatePackPriceFromItems(selectedItems);
+
+    cart.push({
+        name: `${packName} (custom)`,
+        items: selectedItems,
+        total
+    });
+    updateCartUI();
+    closeModal();
+}
+
+function updateCartUI() {
+    const cartItemsEl = document.getElementById("cart-items");
+    if (!cartItemsEl) return;
+
+    cartItemsEl.innerHTML = cart.map(c => `
+        <div class="cart-item">
+            <strong>${c.name}</strong><br>
+            ${c.items.join(", ")}<br>
+            R${c.total.toFixed(2)}
+        </div>
+    `).join("");
+
+    const total = cart.reduce((acc, c) => acc + c.total, 0);
+    const totalEl = document.getElementById("cart-total");
+    if (totalEl) totalEl.textContent = total.toFixed(2);
+
+    const countEl = document.getElementById("cart-count");
+    if (countEl) countEl.textContent = cart.length;
+}
+
+function toggleCart() {
+    const cartPanel = document.getElementById("cart-panel");
+    if (!cartPanel) return;
+    cartPanel.classList.toggle("open");
+}
+
+function checkout() {
+    alert("Checkout not implemented yet!");
+}
+
+/* BIND ADD TO CART BUTTONS */
+document.querySelectorAll(".add-to-cart-btn").forEach((btn, index) => {
+    btn.onclick = (e) => {
+        const packName = btn.closest(".product-card").dataset.pack;
+        if (packName === "Customised Pack") {
+            showProductDetails(packName);
+        } else {
+            const total = calculatePackPrice(packName);
+            cart.push({ name: packName, items: productDetails[packName], total });
+            updateCartUI();
+        }
+        e.stopPropagation();
+    };
+});
+
+function updateAllPackPrices() {
+    document.querySelectorAll(".product-card").forEach(card => {
+        const packName = card.dataset.pack;
+        const priceEl = card.querySelector(".new-price");
+        if (priceEl && productDetails[packName]) {
+            const total = calculatePackPrice(packName);
+            priceEl.textContent = `R${total.toFixed(2)}`;
+            priceEl.classList.add("pop");
+            setTimeout(() => priceEl.classList.remove("pop"), 300);
+        }
+    });
+}
+
+// Run on page load
+updateAllPackPrices();
+
+</script>
+
+</body>
+</html>
