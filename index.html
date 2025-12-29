@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&display=swap" rel="stylesheet">
+
+<style>
+/* ===== YOUR ORIGINAL STYLES (UNCHANGED) ===== */
+.hamburger{font-size:28px;cursor:pointer;position:fixed;left:10px;top:10px;z-index:3000}
+#side-menu{position:fixed;left:0;top:0;width:220px;height:100%;background:#fff;box-shadow:2px 0 10px rgba(0,0,0,.12);padding-top:60px;z-index:1600;transform:translateX(-100%);transition:.33s}
+#side-menu.open{transform:translateX(0)}
+#side-menu a{padding:15px;display:block;text-decoration:none;color:#333;font-size:18px;border-bottom:1px solid #e5e5e5}
+
+body{margin:0;font-family:Arial,sans-serif;background:#f8f8f8}
+
+header{background:#60a5fa;color:#fff;padding:20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:2500}
+.site-title{font-family:'Baloo 2',cursive;font-size:24px}
+
+.hero{position:relative;text-align:center;padding:80px 20px}
+.hero::before{content:"";position:absolute;inset:0;background:url('BackgroundPicture.jpg') center/cover no-repeat;opacity:.4}
+.hero h2,.hero p{position:relative;font-family:'Baloo 2',cursive}
+
+.products{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;padding:40px;max-width:1200px;margin:auto}
+.product-card{background:#FFF9C4;border-radius:12px;padding:20px;box-shadow:0 4px 8px rgba(0,0,0,.1);text-align:center;cursor:pointer}
+.product-card img{width:100%;height:200px;object-fit:cover;border-radius:10px}
+.price-row{display:flex;justify-content:center;gap:10px}
+.new-price{color:#e11d48;font-size:1.5rem;font-weight:700}
+
+.add-to-cart-btn{background:#3b82f6;color:#fff;padding:10px 20px;border:none;border-radius:8px;cursor:pointer;font-family:'Baloo 2',cursive}
+
+#cart-panel{position:fixed;right:0;top:0;width:320px;height:100%;background:#fff;box-shadow:-4px 0 10px rgba(0,0,0,.2);padding:20px;transform:translateX(100%);transition:.33s;z-index:9999}
+#cart-panel.open{transform:translateX(0)}
+
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);justify-content:center;align-items:center}
+.modal-content{background:#fff;padding:20px;width:90%;max-width:400px;border-radius:10px}
+</style>
+</head>
+
+<body>
+
+<div id="menu-btn" class="hamburger">☰</div>
+
+<nav id="side-menu">
+  <a href="index.html">Home</a>
+  <a href="#shop">Shop</a>
+  <a href="#about">About</a>
+  <a href="contact.html">Contact</a>
+</nav>
+
+<header>
+  <h1 class="site-title">Eminent Services</h1>
+  <div id="cart-icon" style="cursor:pointer;">🛒 <span id="cart-count">0</span></div>
+</header>
+
+<section class="hero">
+  <h2>Affordable Stationery Packs for Parents & Schools</h2>
+  <p>Quality stationery delivered nationwide.</p>
+</section>
+
+<section class="products">
+
+<div class="product-card" data-pack="Quarter Pack">
+  <img src="BasicPack.jpg">
+  <h3>Quarter Pack</h3>
+  <div class="price-row"><span class="new-price" id="price-Quarter-Pack">R0</span></div>
+  <button class="add-to-cart-btn">Add to Cart</button>
+</div>
+
+<div class="product-card" data-pack="2 Quarter Pack">
+  <img src="StandardPack.jpg">
+  <h3>2 Quarter Pack</h3>
+  <div class="price-row"><span class="new-price" id="price-2-Quarter-Pack">R0</span></div>
+  <button class="add-to-cart-btn">Add to Cart</button>
+</div>
+
+<div class="product-card" data-pack="Full Package">
+  <img src="DeluxePack.jpg">
+  <h3>Full Package</h3>
+  <div class="price-row"><span class="new-price" id="price-Full-Package">R0</span></div>
+  <button class="add-to-cart-btn">Add to Cart</button>
+</div>
+
+<div class="product-card" data-pack="Customised Pack">
+  <img src="CustomisedPack.jpg">
+  <h3>Customised Pack</h3>
+  <div class="price-row"><span class="new-price" id="price-Customised-Pack">R0</span></div>
+  <button class="add-to-cart-btn">Add to Cart</button>
+</div>
+
+</section>
+
+<div id="cart-panel">
+  <button id="close-cart">Close ×</button>
+  <h3>Your Cart</h3>
+  <div id="cart-items"></div>
+  <h3>Total: R<span id="cart-total">0.00</span></h3>
+</div>
+
+<div id="product-modal" class="modal">
+  <div class="modal-content">
+    <span id="close-modal">×</span>
+    <h2 id="modal-title"></h2>
+    <ul id="modal-items"></ul>
+    <p>Total: <span id="modal-total">R0</span></p>
+  </div>
+</div>
+
+<script>
+/* ===== YOUR ORIGINAL PRICING LOGIC (UNCHANGED) ===== */
+const itemPrices = {
+  "Bic Clic pen":9.75,"Bic Orange fine point":6.63,"Faber Castell Cap pen":4.94,
+  "Staedtler pencil":13.26,"Faber Castell pencil":9.36,"Coloured pens":51.22,
+  "Scissors Stainless":10.01,"Permanent Marker":70.07,"Eraser":7.15,
+  "Retractable Wax Crayons":86.19,"Highlighters (6 Pck)":47.45,
+  "Staedtler Colouring Pencils (12 Pck)":50.18,"Faber Castell Colouring Pencils (12 Pck)":47.71,
+  "Pritt Glue (43g)":60.19,"Staedtler Glue (40g)":31.07,"Tower Star Stickers":14.04,
+  "Ruler Flexible":10.66,"Ream of Paper":115.7,"A4 Quad and Margin 192 pg":27.56,
+  "A4 Quad and Margin 72 pg":7.02,"A4 Feint and Margin 192 pg":26.61,
+  "A4 Feint and Margin 72 pg":6.63,"Flip file (20 pockets)":25.35,
+  "Flip file (50 pockets)":38.87,"Sharpener (with holder)":13.13,"Labels":58.5,
+  "Cadii Bag":1300,"Pencil Case":33.93,"Tissue Box (200)":31.72,
+  "Antibacterial Wipes":40.56,"Afrikaans Dictionary":264.55
+};
+
+const productDetails = { /* FULL LIST KEPT */ 
+  "Quarter Pack":[ "4 × Bic Clic pen","4 × Staedtler pencil","1 × Coloured pens","1 × Scissors Stainless","1 × Permanent Marker","1 × Eraser","1 × Retractable Wax Crayons","1 × Highlighters (6 Pck)","1 × Staedtler Colouring Pencils (12 Pck)","1 × Staedtler Glue (40g)","1 × Tower Star Stickers","1 × Ruler Flexible","1 × Ream of Paper","1 × A4 Quad and Margin 192 pg","1 × A4 Quad and Margin 72 pg","1 × A4 Feint and Margin 192 pg","1 × A4 Feint and Margin 72 pg","1 × Flip file (20 pockets)","1 × Sharpener (with holder)","1 × Labels" ],
+  "2 Quarter Pack":[ "8 × Faber Castell Cap pen","8 × Faber Castell pencil","1 × Coloured pens","1 × Scissors Stainless","1 × Permanent Marker","1 × Eraser","1 × Retractable Wax Crayons","1 × Highlighters (6 Pck)","1 × Faber Castell Colouring Pencils (12 Pck)","4 × Pritt Glue (43g)","1 × Tower Star Stickers","1 × Ruler Flexible","1 × Ream of Paper","1 × A4 Quad and Margin 192 pg","1 × A4 Quad and Margin 72 pg","1 × A4 Feint and Margin 192 pg","1 × A4 Feint and Margin 72 pg","1 × Flip file (50 pockets)","1 × Sharpener (with holder)","1 × Labels" ],
+  "Full Package":[ "16 × Bic Orange fine point","8 × Faber Castell pencil","1 × Coloured pens","1 × Scissors Stainless","1 × Permanent Marker","2 × Eraser","1 × Retractable Wax Crayons","1 × Highlighters (6 Pck)","1 × Faber Castell Colouring Pencils (12 Pck)","8 × Pritt Glue (43g)","1 × Tower Star Stickers","1 × Ruler Flexible","1 × Ream of Paper","4 × A4 Quad and Margin 192 pg","4 × A4 Quad and Margin 72 pg","4 × A4 Feint and Margin 192 pg","4 × A4 Feint and Margin 72 pg","1 × Flip file (20 pockets)","1 × Flip file (50 pockets)","1 × Sharpener (with holder)","1 × Labels","1 × Pencil Case","1 × Tissue Box (200)","1 × Antibacterial Wipes","1 × Afrikaans Dictionary" ],
+  "Customised Pack":[ "1 × Bic Clic pen","1 × Bic Orange fine point","1 × Faber Castell Cap pen","1 × Staedtler pencil","1 × Faber Castell pencil","1 × Coloured pens","1 × Scissors Stainless","1 × Permanent Marker","1 × Eraser","1 × Retractable Wax Crayons","1 × Highlighters (6 Pck)","1 × Staedtler Colouring Pencils (12 Pck)","1 × Faber Castell Colouring Pencils (12 Pck)","1 × Pritt Glue (43g)","1 × Staedtler Glue (40g)","1 × Tower Star Stickers","1 × Ruler Flexible","1 × Ream of Paper","1 × A4 Quad and Margin 192 pg","1 × A4 Quad and Margin 72 pg","1 × A4 Feint and Margin 192 pg","1 × A4 Feint and Margin 72 pg","1 × Flip file (20 pockets)","1 × Flip file (50 pockets)","1 × Sharpener (with holder)","1 × Labels","1 × Cadii Bag","1 × Pencil Case","1 × Tissue Box (200)","1 × Antibacterial Wipes","1 × Afrikaans Dictionary" ]
+};
+
+function parseItem(str){
+  const [q,n]=str.split("×").map(s=>s.trim());
+  return {qty:parseInt(q)||1,name:n};
+}
+
+function calculatePackPrice(pack){
+  return (productDetails[pack]||[]).reduce((t,i)=>{
+    const {qty,name}=parseItem(i);
+    return t+(qty*(itemPrices[name]||0));
+  },0);
+}
+
+/* ===== EVENT FIXES ===== */
+let cart=[];
+
+document.addEventListener("DOMContentLoaded",()=>{
+  document.querySelectorAll(".product-card").forEach(card=>{
+    const pack=card.dataset.pack;
+    const total=calculatePackPrice(pack);
+    card.querySelector(".new-price").textContent="R"+total.toFixed(2);
+
+    card.addEventListener("click",()=>showModal(pack));
+    card.querySelector(".add-to-cart-btn").addEventListener("click",e=>{
+      e.stopPropagation();
+      cart.push({name:pack,price:total});
+      document.getElementById("cart-count").textContent=cart.length;
+    });
+  });
+
+  document.getElementById("cart-icon").onclick=()=>document.getElementById("cart-panel").classList.toggle("open");
+  document.getElementById("close-cart").onclick=()=>document.getElementById("cart-panel").classList.remove("open");
+  document.getElementById("close-modal").onclick=()=>document.getElementById("product-modal").style.display="none";
+  document.getElementById("menu-btn").onclick=()=>document.getElementById("side-menu").classList.toggle("open");
+});
+
+function showModal(pack){
+  document.getElementById("modal-title").textContent=pack;
+  document.getElementById("modal-items").innerHTML=productDetails[pack].map(i=>`<li>${i}</li>`).join("");
+  document.getElementById("modal-total").textContent="R"+calculatePackPrice(pack).toFixed(2);
+  document.getElementById("product-modal").style.display="flex";
+}
+</script>
+
+</body>
+</html>
